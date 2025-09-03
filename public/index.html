@@ -1,4 +1,58 @@
-<html><head>
-  <title>わかめ</title>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>埋め込みされるサイト</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
-<body><iframe src="https://xeroxproxy-ver2-0notpw.vercel.app/" style="border: none; margin: 0; height: 100vh; width: 100%;"></iframe></body></html>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+  <script>
+    // 許可する埋め込み元のドメインを設定します。
+    // 例: ['https://trusted-domain.com', 'https://another-trusted-site.com']
+    // 同じドメインからの埋め込みを許可するには、'same-origin'という文字列をリストに含めます。
+    const allowedDomains = ['same-origin'];
+
+    // ページが直接ロードされた場合（iframe内ではない場合）
+    if (window.self === window.top) {
+      // ユーザーを別のページにリダイレクト
+      window.location.href = 'about:blank'; // またはカスタムエラーページ
+      // または、直接エラーメッセージを表示
+      document.body.innerHTML = '<div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full text-center"><h1 class="text-2xl font-bold text-red-700 mb-2">アクセス拒否</h1><p class="text-gray-600">このページは直接アクセスできません。</p></div>';
+    } else {
+      // ページがiframe内でロードされた場合
+      const parentOrigin = document.referrer ? new URL(document.referrer).origin : '';
+      const currentOrigin = window.location.origin;
+      
+      let isAllowed = false;
+      
+      // 許可リストをチェック
+      if (allowedDomains.includes('same-origin') && parentOrigin === currentOrigin) {
+        isAllowed = true;
+      } else if (allowedDomains.includes(parentOrigin)) {
+        isAllowed = true;
+      }
+
+      if (!isAllowed) {
+        // 埋め込み元が許可されていない場合
+        document.body.innerHTML = '<div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full text-center"><h1 class="text-2xl font-bold text-red-700 mb-2">埋め込み元が不正です</h1><p class="text-gray-600">このページは、許可されたドメインからの埋め込みでのみ表示可能です。</p></div>';
+      } else {
+        // 埋め込み元が許可されている場合、コンテンツを表示
+        document.body.innerHTML = `
+          <div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full text-center">
+            <h1 class="text-2xl font-bold text-green-700 mb-2">アクセス成功！</h1>
+            <p class="text-gray-600">このページは埋め込みによって正しく表示されています。</p>
+          </div>
+        `;
+      }
+    }
+  </script>
+  
+</body>
+</html>
